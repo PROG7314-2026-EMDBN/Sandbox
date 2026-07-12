@@ -10,4 +10,6 @@ object Routes {
     const val FOCUSLOG = "focuslog"
     const val NOTIFICATIONS = "notifications"
     const val PROFILE = "profile"
+
+    const val OPEN_LIBRARY = "open_library"
 }

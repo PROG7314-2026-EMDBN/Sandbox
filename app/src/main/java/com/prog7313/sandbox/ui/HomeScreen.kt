@@ -20,6 +20,7 @@ fun HomeScreen(
     onOpenFocusLog: () -> Unit,
     onOpenNotifications: () -> Unit,
     onOpenProfile: () -> Unit,
+    onOpenLibrary: () -> Unit,
     onExit: () -> Unit
 ) {
     Column(
@@ -67,6 +68,13 @@ fun HomeScreen(
             onClick = onOpenProfile,
             modifier = Modifier.fillMaxWidth()
         ) { Text("Open Profile") }
+
+        Spacer(Modifier.height(12.dp))
+
+        Button(
+            onClick = onOpenLibrary,
+            modifier = Modifier.fillMaxWidth()
+        ) { Text("Retrofit API Demo") }
 
         Spacer(Modifier.height(24.dp))
 
