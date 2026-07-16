@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @Composable
 fun HomeScreen(
@@ -21,13 +23,15 @@ fun HomeScreen(
     onOpenNotifications: () -> Unit,
     onOpenProfile: () -> Unit,
     onOpenLibrary: () -> Unit,
+    onOpenLocationDemo: () -> Unit,
     onExit: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Sandbox Home", style = MaterialTheme.typography.headlineMedium)
@@ -75,6 +79,17 @@ fun HomeScreen(
             onClick = onOpenLibrary,
             modifier = Modifier.fillMaxWidth()
         ) { Text("Retrofit API Demo") }
+
+        Spacer(
+            modifier = Modifier.height(12.dp)
+        )
+
+        Button(
+            onClick = onOpenLocationDemo,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Location Access Demo")
+        }
 
         Spacer(Modifier.height(24.dp))
 
