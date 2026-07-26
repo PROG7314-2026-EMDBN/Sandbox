@@ -14,6 +14,7 @@ class AuthViewModel(
 ) : ViewModel() {
 
     private val profileRepo = ProfileRepository()
+
     private val _uiState = MutableStateFlow(
         AuthUiState(isAuthenticated = repo.currentUser != null)
     )
@@ -27,37 +28,28 @@ class AuthViewModel(
         _uiState.value = _uiState.value.copy(password = value, error = null)
     }
 
+    fun showError(message: String) {
+        _uiState.value = _uiState.value.copy(
+            isLoading = false,
+            error = message
+        )
+    }
+
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
+    }
+
     fun login() {
         val email = _uiState.value.email.trim()
         val password = _uiState.value.password
 
         if (email.isBlank() || password.isBlank()) {
-            _uiState.value = _uiState.value.copy(error = "Email and password are required")
+            showError("Email and password are required")
             return
         }
 
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-
-            val result = repo.login(email, password)
-
-            _uiState.value = if (result.isSuccess) {
-                val user = repo.currentUser
-                if (user != null) {
-                    profileRepo.ensureProfileExists(user.uid, user.email.orEmpty())
-                }
-
-                _uiState.value.copy(
-                    isLoading = false,
-                    isAuthenticated = true,
-                    error = null
-                )
-            } else {
-                _uiState.value.copy(
-                    isLoading = false,
-                    error = result.exceptionOrNull()?.message ?: "Login failed"
-                )
-            }
+        runAuthentication {
+            repo.login(email, password)
         }
     }
 
@@ -66,19 +58,40 @@ class AuthViewModel(
         val password = _uiState.value.password
 
         if (email.isBlank() || password.isBlank()) {
-            _uiState.value = _uiState.value.copy(error = "Email and password are required")
+            showError("Email and password are required")
             return
         }
 
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+        runAuthentication {
+            repo.register(email, password)
+        }
+    }
 
-            val result = repo.register(email, password)
+    fun loginWithGoogleToken(idToken: String) {
+        runAuthentication {
+            repo.loginWithGoogle(idToken)
+        }
+    }
+
+    private fun runAuthentication(
+        operation: suspend () -> Result<com.google.firebase.auth.FirebaseUser>
+    ) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                error = null
+            )
+
+            val result = operation()
 
             _uiState.value = if (result.isSuccess) {
-                val user = repo.currentUser
+                val user = result.getOrNull()
+
                 if (user != null) {
-                    profileRepo.ensureProfileExists(user.uid, user.email.orEmpty())
+                    profileRepo.ensureProfileExists(
+                        uid = user.uid,
+                        email = user.email.orEmpty()
+                    )
                 }
 
                 _uiState.value.copy(
@@ -89,7 +102,8 @@ class AuthViewModel(
             } else {
                 _uiState.value.copy(
                     isLoading = false,
-                    error = result.exceptionOrNull()?.message ?: "Registration failed"
+                    error = result.exceptionOrNull()?.localizedMessage
+                        ?: "Authentication failed"
                 )
             }
         }

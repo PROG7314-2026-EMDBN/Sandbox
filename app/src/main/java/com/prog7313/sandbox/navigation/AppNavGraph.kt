@@ -3,11 +3,13 @@ package com.prog7313.sandbox.navigation
 import AddGadgetScreen
 import GadgetsScreen
 import androidx.compose.runtime.Composable
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.prog7313.sandbox.data.BiometricPreferencesRepository
 import com.prog7313.sandbox.model.Gadget
 import com.prog7313.sandbox.ui.FormScreen
 import com.prog7313.sandbox.ui.HelloScreen
@@ -25,6 +27,8 @@ import com.prog7313.sandbox.ui.LocationDemoScreen
 @Composable
 fun AppNavGraph(
     settingsVm: SettingsViewModel,
+    activity: FragmentActivity,
+    biometricRepository: BiometricPreferencesRepository,
     onExit: () -> Unit,
     onLogout: () -> Unit
 ) {
@@ -90,7 +94,11 @@ fun AppNavGraph(
             }
 
             composable(Routes.SETTINGS) {
-                SettingsScreen(settingsVm = settingsVm)
+                SettingsScreen(
+                    settingsVm = settingsVm,
+                    activity = activity,
+                    biometricRepository = biometricRepository
+                )
             }
 
             composable(Routes.FOCUSLOG) {
