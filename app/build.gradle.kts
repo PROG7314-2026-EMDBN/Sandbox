@@ -111,6 +111,8 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.9")
 
     testImplementation(libs.junit)
+    testImplementation("com.squareup.okhttp3:mockwebserver3:5.3.2")
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
